@@ -1,0 +1,1801 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Naming Dashboard / OlympTrade</title>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@200,300,400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0d0c;
+    --bg-elev: #141311;
+    --surface: #18171430;
+    --border: #232120;
+    --border-mid: #2d2b29;
+    --border-strong: #3a3835;
+    --text: #e8e3d6;
+    --text-dim: #807a6e;
+    --text-faint: #4a463f;
+    --accent: #c9b98e;
+    --accent-soft: rgba(201, 185, 142, 0.10);
+    --warn: #d49a6a;
+    --warn-soft: rgba(212, 154, 106, 0.10);
+
+    --font: 'Switzer', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    --gutter: 48px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--font); -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400; font-size: 14px; line-height: 1.5;
+    letter-spacing: -0.005em;
+  }
+  body { min-height: 100vh; padding-bottom: 72px; }
+  button { font-family: inherit; }
+
+  /* === HEADER === */
+  .head { padding: 56px var(--gutter) 40px; border-bottom: 1px solid var(--border); }
+  .head-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 24px; flex-wrap: wrap; margin-bottom: 56px;
+  }
+  .brand {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); font-weight: 500;
+    display: inline-flex; align-items: center; gap: 12px;
+  }
+  .admin-badge {
+    font-size: 10px; letter-spacing: 0.12em;
+    padding: 3px 8px; border: 1px solid var(--accent);
+    color: var(--accent); border-radius: 3px;
+  }
+  .head-date {
+    font-size: 11px; color: var(--text-faint);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  h1 {
+    font-weight: 300; font-size: clamp(32px, 4.4vw, 52px);
+    line-height: 1.05; letter-spacing: -0.025em;
+    max-width: 18ch; color: var(--text);
+  }
+  .head-sub {
+    margin-top: 24px; max-width: 62ch;
+    color: var(--text-dim); font-size: 14px; line-height: 1.6;
+  }
+
+  /* === CRITERIA === */
+  .criteria { margin-top: 40px; display: flex; gap: 56px; flex-wrap: wrap; }
+  .crit { min-width: 180px; }
+  .crit-label {
+    font-size: 10px; letter-spacing: 0.14em;
+    color: var(--text-faint); text-transform: uppercase;
+    margin-bottom: 6px; font-weight: 500;
+  }
+  .crit-val { font-size: 13px; color: var(--text); line-height: 1.45; }
+
+  /* === STATS === */
+  .stats {
+    display: flex; gap: 56px; margin-top: 48px;
+    padding-top: 32px; border-top: 1px solid var(--border); flex-wrap: wrap;
+  }
+  .stat { min-width: 120px; }
+  .stat-label {
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-faint);
+    font-weight: 500; margin-bottom: 8px;
+  }
+  .stat-val {
+    font-size: 32px; line-height: 1; font-weight: 300;
+    letter-spacing: -0.02em; color: var(--text);
+  }
+  .stat-val .sub {
+    font-size: 14px; color: var(--text-faint);
+    margin-left: 4px; font-weight: 400;
+  }
+
+  /* === ADMIN PANELS COMMON === */
+  .panel {
+    margin: 32px var(--gutter) 0;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .panel-head {
+    padding: 18px 24px;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; flex-wrap: wrap;
+  }
+  .panel-head h3 {
+    font-weight: 400; font-size: 16px; letter-spacing: -0.01em;
+  }
+  .panel-head .meta {
+    font-size: 11px; color: var(--text-faint);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .panel-controls { display: flex; gap: 12px; align-items: center; }
+  .panel-controls label {
+    font-size: 10px; color: var(--text-faint);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    font-weight: 500;
+  }
+  .panel-controls select {
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border-mid); padding: 5px 10px;
+    font-size: 12px; cursor: pointer; border-radius: 4px;
+    font-family: inherit;
+  }
+
+  /* === VOTERS PANEL === */
+  .voters-list { padding: 8px 0; }
+  .voter-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 80px;
+    gap: 20px; padding: 10px 24px;
+    align-items: center; font-size: 13px;
+  }
+  .voter-row .voter-name {
+    color: var(--text); font-weight: 500;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .voter-row .voter-name .me {
+    font-size: 10px; color: var(--accent);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-left: 6px;
+  }
+  .voter-progress {
+    height: 6px; background: var(--border);
+    border-radius: 3px; overflow: hidden;
+  }
+  .voter-progress-fill {
+    height: 100%; background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+  .voter-count {
+    color: var(--text-dim); font-size: 12px;
+    font-variant-numeric: tabular-nums; text-align: right;
+  }
+  .voter-count strong { color: var(--text); font-weight: 500; }
+
+  /* === LEADERBOARD === */
+  .lb-row {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--bg-elev); }
+  .lb-row.expanded { background: var(--bg-elev); }
+  .lb-main {
+    display: grid;
+    grid-template-columns: 32px 1fr 90px 90px 60px 100px 20px;
+    gap: 20px; padding: 12px 24px;
+    align-items: center; font-size: 13px;
+  }
+  .lb-rank {
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+  }
+  .lb-name { color: var(--text); font-size: 14px; }
+  .lb-cat {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-faint);
+  }
+  .lb-spread {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+  }
+  .lb-spread.high { color: var(--warn); }
+  .lb-spread.mid { color: var(--text-dim); }
+  .lb-spread.low { color: var(--text-faint); }
+  .lb-avg {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent); font-weight: 500;
+    text-align: right; font-size: 14px;
+  }
+  .lb-counts {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-dim); font-size: 12px;
+    text-align: right;
+  }
+  .lb-chevron {
+    color: var(--text-faint); font-size: 10px;
+    transition: transform 0.2s;
+    text-align: center;
+  }
+  .lb-row.expanded .lb-chevron { transform: rotate(180deg); }
+  .lb-detail {
+    display: none;
+    padding: 4px 24px 18px 76px;
+    border-top: 1px dashed var(--border);
+  }
+  .lb-row.expanded .lb-detail { display: block; }
+  .lb-detail-section {
+    margin-top: 14px;
+  }
+  .lb-detail-label {
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-faint);
+    font-weight: 500; margin-bottom: 8px;
+  }
+  .lb-vote-pill {
+    display: inline-block;
+    margin: 0 6px 4px 0;
+    padding: 3px 9px;
+    background: var(--bg);
+    border: 1px solid var(--border-mid);
+    border-radius: 3px;
+    font-size: 12px;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .lb-vote-pill .vp-name { color: var(--text); margin-right: 4px; }
+  .lb-vote-pill .vp-rate { color: var(--accent); font-weight: 500; }
+  .lb-vote-pill .vp-short { color: var(--accent); margin-left: 4px; }
+  .lb-vote-pill.no-rating .vp-rate { color: var(--text-faint); }
+  .lb-detail-note {
+    padding: 8px 12px; margin-bottom: 6px;
+    background: var(--bg); border-left: 2px solid var(--accent);
+    font-size: 12px; line-height: 1.5; color: var(--text);
+    border-radius: 0 3px 3px 0;
+  }
+  .lb-detail-note .lb-note-author {
+    color: var(--accent); font-weight: 500;
+    margin-right: 6px;
+  }
+
+  /* === TWO COLUMN PANEL ROW === */
+  .panels-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 32px var(--gutter) 0;
+  }
+  .panels-row .panel { margin: 0; }
+  @media (max-width: 900px) {
+    .panels-row { grid-template-columns: 1fr; }
+  }
+
+  /* === TOP PER CATEGORY / MOST DIVISIVE === */
+  .mini-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 14px; padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+    align-items: center; font-size: 13px;
+  }
+  .mini-row:last-child { border-bottom: none; }
+  .mini-row:hover { background: var(--bg-elev); }
+  .mini-label {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-faint);
+    font-weight: 500; min-width: 70px;
+  }
+  .mini-name { color: var(--text); }
+  .mini-spread {
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    min-width: 40px; text-align: right;
+  }
+  .mini-spread.high { color: var(--warn); }
+  .mini-avg {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent); font-weight: 500;
+    min-width: 36px; text-align: right;
+  }
+  .mini-empty {
+    padding: 18px 24px; color: var(--text-faint);
+    font-size: 12px; text-align: center;
+  }
+
+  /* === NOTES FEED === */
+  .feed-toggle {
+    background: var(--bg-elev); border: none;
+    padding: 18px 24px; width: 100%;
+    text-align: left; cursor: pointer;
+    border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    color: var(--text); font-family: inherit;
+    font-size: 16px; font-weight: 400;
+  }
+  .feed-toggle:hover { background: var(--surface); }
+  .feed-toggle .cnt {
+    font-size: 12px; color: var(--text-faint);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    font-weight: 500;
+  }
+  .feed-toggle .chev {
+    color: var(--text-faint); font-size: 10px;
+    transition: transform 0.2s;
+  }
+  .feed-toggle.open .chev { transform: rotate(180deg); }
+  .feed-body { display: none; padding: 8px 0; }
+  .feed-body.open { display: block; }
+  .feed-group {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .feed-group:last-child { border-bottom: none; }
+  .feed-group-name {
+    font-size: 15px; color: var(--text);
+    margin-bottom: 10px; font-weight: 400;
+  }
+  .feed-group-name .feed-cat {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-faint);
+    margin-left: 10px; font-weight: 500;
+  }
+  .feed-note {
+    padding: 8px 12px; margin-top: 6px;
+    background: var(--bg); border-left: 2px solid var(--border-mid);
+    font-size: 13px; line-height: 1.55; color: var(--text-dim);
+    border-radius: 0 3px 3px 0;
+  }
+  .feed-note .feed-author {
+    color: var(--accent); font-weight: 500;
+    margin-right: 6px;
+  }
+
+  /* === FILTERS === */
+  .filterbar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(14, 13, 12, 0.94); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border); border-top: 1px solid var(--border);
+    margin-top: 56px;
+    padding: 14px var(--gutter);
+    display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  }
+  .filter-group { display: flex; gap: 2px; }
+  .filter-btn {
+    font-size: 12px; padding: 7px 13px;
+    background: transparent; color: var(--text-dim);
+    border: 1px solid transparent; cursor: pointer;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    border-radius: 4px; font-weight: 450;
+    letter-spacing: -0.005em;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .filter-btn:hover { color: var(--text); }
+  .filter-btn.active { color: var(--text); border-color: var(--border-strong); }
+  .filter-btn .count {
+    font-size: 11px; color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .filter-btn.active .count { color: var(--text-dim); }
+  .sort-group { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .sort-label {
+    font-size: 10px; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--text-faint); font-weight: 500;
+  }
+  .sort-select {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border-mid); padding: 6px 10px;
+    font-size: 12px; cursor: pointer; border-radius: 4px; font-family: inherit;
+  }
+  .sort-select:hover { border-color: var(--border-strong); }
+  .sort-select:focus { outline: none; border-color: var(--accent); }
+
+  /* === CONTENT === */
+  .content { padding: 56px var(--gutter); }
+  .category-section { margin-bottom: 80px; }
+  .category-section:last-child { margin-bottom: 0; }
+  .cat-header {
+    margin-bottom: 32px; padding-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .cat-header-top {
+    display: flex; align-items: baseline; gap: 16px; margin-bottom: 14px;
+  }
+  .cat-num {
+    font-size: 11px; color: var(--text-faint);
+    letter-spacing: 0.14em; font-variant-numeric: tabular-nums; font-weight: 500;
+  }
+  .cat-title {
+    font-weight: 400; font-size: 24px;
+    letter-spacing: -0.018em; color: var(--text); line-height: 1.1;
+  }
+  .cat-desc {
+    max-width: 72ch; color: var(--text-dim);
+    font-size: 14px; line-height: 1.6;
+  }
+
+  /* === GRID === */
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1px; background: var(--border); border: 1px solid var(--border);
+  }
+  .card {
+    background: var(--bg); padding: 24px 24px 20px;
+    transition: background 0.18s ease; position: relative;
+    display: flex; flex-direction: column; min-height: 240px;
+  }
+  .card:hover { background: var(--bg-elev); }
+  .card.shortlisted { background: var(--bg-elev); }
+  .card.shortlisted::after {
+    content: ''; position: absolute; top: 16px; right: 16px;
+    width: 5px; height: 5px; border-radius: 50%; background: var(--accent);
+  }
+
+  .card-top {
+    display: flex; justify-content: space-between;
+    align-items: center; gap: 12px; margin-bottom: 16px;
+  }
+  .card-tag {
+    font-size: 10px; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--text-faint); font-weight: 500;
+  }
+  .card-shortlist {
+    background: none; border: none; padding: 4px;
+    cursor: pointer; color: var(--text-faint);
+    transition: color 0.15s ease; font-size: 14px; line-height: 1;
+  }
+  .card-shortlist:hover { color: var(--text); }
+  .card-shortlist.active { color: var(--accent); }
+
+  .card-name {
+    font-size: 28px; line-height: 1.1; font-weight: 400;
+    letter-spacing: -0.025em; margin-bottom: 6px;
+    word-break: break-word; color: var(--text);
+  }
+  .card-domain {
+    font-size: 11px; color: var(--text-dim);
+    margin-bottom: 14px; font-variant-numeric: tabular-nums;
+  }
+  .card-domain .ok {
+    color: var(--text-dim); font-size: 10px;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-left: 4px;
+  }
+  .card-desc {
+    font-size: 13px; line-height: 1.55;
+    color: var(--text-dim); flex: 1; margin-bottom: 18px;
+  }
+
+  .rating { display: flex; gap: 4px; margin-bottom: 14px; }
+  .rating-dot {
+    width: 22px; height: 22px;
+    border: 1px solid var(--border-mid); background: transparent;
+    cursor: pointer; transition: border-color 0.12s, background 0.12s, color 0.12s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--text-faint);
+    border-radius: 3px; font-family: inherit; font-variant-numeric: tabular-nums;
+  }
+  .rating-dot:hover { border-color: var(--accent); color: var(--accent); }
+  .rating-dot.filled {
+    background: var(--accent); border-color: var(--accent);
+    color: var(--bg); font-weight: 500;
+  }
+
+  .card-admin-stat {
+    margin-top: -4px; margin-bottom: 12px;
+    padding: 8px 10px;
+    background: var(--accent-soft);
+    border-left: 2px solid var(--accent);
+    font-size: 11px; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+    border-radius: 0 3px 3px 0;
+  }
+  .card-admin-stat strong { color: var(--text); font-weight: 500; }
+  .card-admin-stat .none { color: var(--text-faint); }
+
+  /* NOTES */
+  .note-block { margin-top: 4px; }
+  .note-toggle {
+    background: none; border: none; color: var(--text-faint);
+    font-size: 11px; cursor: pointer; padding: 0; text-align: left;
+    transition: color 0.15s; font-family: inherit;
+  }
+  .note-toggle:hover { color: var(--text); }
+  .note-toggle.has-note { color: var(--accent); }
+  .note-field { margin-top: 10px; display: none; }
+  .note-field.open { display: block; }
+  .note-input {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--border-mid); color: var(--text);
+    padding: 8px 10px; font-family: inherit; font-size: 12px;
+    resize: vertical; min-height: 56px; border-radius: 3px; line-height: 1.5;
+  }
+  .note-input:focus { outline: none; border-color: var(--accent); }
+  .note-actions {
+    display: flex; gap: 8px; align-items: center;
+    margin-top: 8px;
+  }
+  .note-save {
+    font-size: 11px; padding: 5px 12px;
+    background: var(--accent); color: var(--bg);
+    border: 1px solid var(--accent); cursor: pointer;
+    border-radius: 3px; font-weight: 500; font-family: inherit;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .note-save:hover { background: #d5c79d; border-color: #d5c79d; }
+  .note-save.dirty { background: var(--warn); border-color: var(--warn); }
+  .note-save.dirty:hover { background: #dba778; border-color: #dba778; }
+  .note-save:disabled { opacity: 0.5; cursor: not-allowed; }
+  .note-status {
+    font-size: 10px; color: var(--text-faint);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+  .note-status.saved { color: var(--accent); }
+  .note-status.error { color: var(--warn); }
+  .note-hint {
+    font-size: 10px; color: var(--text-faint);
+    letter-spacing: 0.06em; margin-left: auto;
+  }
+
+  .team-notes {
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .team-notes-label {
+    font-size: 10px; letter-spacing: 0.14em;
+    color: var(--text-faint); text-transform: uppercase;
+    font-weight: 500; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .team-notes-label .cnt {
+    font-variant-numeric: tabular-nums;
+    color: var(--text-faint);
+  }
+  .team-note-item {
+    font-size: 12px; line-height: 1.5;
+    color: var(--text-dim); margin-bottom: 10px;
+    padding-left: 10px; border-left: 1px solid var(--border-mid);
+  }
+  .team-note-item:last-child { margin-bottom: 0; }
+  .team-note-author {
+    color: var(--accent); font-weight: 500;
+    margin-right: 4px;
+  }
+
+  /* === ACTION BAR === */
+  .action-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(20, 19, 17, 0.94); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-mid); padding: 12px var(--gutter);
+    display: flex; align-items: center; gap: 12px; z-index: 60;
+  }
+  .ab-info {
+    font-size: 12px; color: var(--text-dim);
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ab-info strong {
+    color: var(--text); font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+  .ab-info .voter { color: var(--accent); font-weight: 500; }
+  .ab-change {
+    background: none; border: none;
+    color: var(--text-faint); font-size: 11px;
+    cursor: pointer; padding: 2px 4px;
+    text-decoration: underline; text-underline-offset: 2px;
+    font-family: inherit;
+  }
+  .ab-change:hover { color: var(--text); }
+  .ab-info .dot { color: var(--text-faint); }
+  .ab-actions { margin-left: auto; display: flex; gap: 6px; }
+  .btn {
+    font-size: 12px; padding: 7px 14px;
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border-mid); cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    border-radius: 4px; font-weight: 450; font-family: inherit;
+  }
+  .btn:hover { border-color: var(--border-strong); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn.primary {
+    background: var(--accent); color: var(--bg);
+    border-color: var(--accent); font-weight: 500;
+  }
+  .btn.primary:hover { background: #d5c79d; border-color: #d5c79d; }
+
+  /* === MODAL === */
+  .modal-bg {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    z-index: 200; display: none;
+    align-items: center; justify-content: center; padding: 32px;
+  }
+  .modal-bg.open { display: flex; }
+  .modal {
+    background: var(--bg-elev); border: 1px solid var(--border-mid);
+    max-width: 460px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    padding: 32px; position: relative; border-radius: 6px;
+  }
+  .modal.wide { max-width: 720px; }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    background: none; border: 1px solid var(--border-mid);
+    color: var(--text-dim); width: 28px; height: 28px;
+    cursor: pointer; border-radius: 3px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .modal-close:hover { color: var(--text); border-color: var(--border-strong); }
+  .modal h2 {
+    font-weight: 400; font-size: 22px;
+    margin-bottom: 12px; letter-spacing: -0.02em;
+  }
+  .modal-sub {
+    font-size: 13px; color: var(--text-dim);
+    margin-bottom: 24px; line-height: 1.55;
+  }
+  .name-input {
+    width: 100%; background: var(--bg);
+    border: 1px solid var(--border-mid); color: var(--text);
+    padding: 12px 14px; font-family: inherit; font-size: 15px;
+    border-radius: 4px; margin-bottom: 20px;
+  }
+  .name-input:focus { outline: none; border-color: var(--accent); }
+  .export-pre {
+    background: var(--bg); border: 1px solid var(--border);
+    padding: 18px; font-family: ui-monospace, 'SF Mono', 'Menlo', monospace;
+    font-size: 12px; line-height: 1.65; color: var(--text);
+    white-space: pre-wrap; word-break: break-word;
+    margin-bottom: 16px; max-height: 50vh; overflow-y: auto;
+    border-radius: 4px;
+  }
+
+  /* === COMPARE === */
+  .compare-wrap {
+    position: fixed; inset: 0; background: var(--bg);
+    z-index: 150; display: none; overflow-y: auto;
+    padding: 48px var(--gutter);
+  }
+  .compare-wrap.open { display: block; }
+  .compare-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 32px; padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .compare-head h2 { font-size: 22px; font-weight: 400; letter-spacing: -0.015em; }
+  .compare-grid {
+    display: grid; gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+  }
+  .compare-grid.cols-1 { grid-template-columns: 1fr; }
+  .compare-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+  .compare-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .compare-grid.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .compare-cell {
+    background: var(--bg); padding: 32px 28px;
+    min-height: 60vh; display: flex; flex-direction: column;
+  }
+  .compare-cell .card-name { font-size: 48px; margin: 18px 0 6px; line-height: 1; }
+  .compare-empty {
+    text-align: center; padding: 80px 20px;
+    color: var(--text-dim); font-size: 13px;
+  }
+  .note-box {
+    margin-top: 14px; padding: 14px 16px;
+    border-left: 2px solid var(--accent);
+    background: var(--accent-soft);
+    font-size: 13px; color: var(--text);
+    line-height: 1.55; border-radius: 0 4px 4px 0;
+  }
+  .note-box-label {
+    font-size: 10px; letter-spacing: 0.14em;
+    color: var(--text-dim); text-transform: uppercase;
+    margin-bottom: 6px; font-weight: 500;
+  }
+
+  /* === TOAST === */
+  .toast {
+    position: fixed; top: 20px; right: 20px;
+    background: var(--bg-elev); border: 1px solid var(--border-strong);
+    color: var(--text); padding: 12px 18px;
+    border-radius: 4px; font-size: 13px;
+    z-index: 500; opacity: 0; pointer-events: none;
+    transform: translateY(-10px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { border-color: var(--warn); color: var(--warn); }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 900px) {
+    :root { --gutter: 24px; }
+    .stats, .criteria { gap: 32px; }
+    .panel, .panels-row { margin-left: 24px; margin-right: 24px; }
+    .compare-grid.cols-2, .compare-grid.cols-3, .compare-grid.cols-4 {
+      grid-template-columns: 1fr;
+    }
+    .lb-main {
+      grid-template-columns: 24px 1fr 50px 60px 20px;
+      gap: 10px;
+    }
+    .lb-cat, .lb-counts { display: none; }
+    .voter-row { grid-template-columns: 120px 1fr 60px; gap: 12px; }
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="head">
+  <div class="head-top">
+    <div class="brand">
+      <span>Naming · Evaluation Dashboard</span>
+      <span class="admin-badge" id="adminBadge" style="display: none;">Admin</span>
+    </div>
+    <div class="head-date" id="dateStamp"></div>
+  </div>
+
+  <h1>Имя для нового продукта.</h1>
+  <p class="head-sub">
+    28 кандидатов в четырёх стратегиях: фантазийные, метафоры с trade, имена, прямые. Все домены свободны для проверки. Прокликай — оцени — сравни — выгрузи шортлист.
+  </p>
+
+  <div class="criteria">
+    <div class="crit"><div class="crit-label">Критерий 01</div><div class="crit-val">Свободный домен в зоне .com</div></div>
+    <div class="crit"><div class="crit-label">Критерий 02</div><div class="crit-val">Произносится и читается интернационально</div></div>
+    <div class="crit"><div class="crit-label">Критерий 03</div><div class="crit-val">Не более двух слогов в слове</div></div>
+  </div>
+
+  <div class="stats" id="statsBlock"></div>
+</header>
+
+<!-- ADMIN PANELS -->
+<div id="adminPanels"></div>
+
+<!-- FILTERS -->
+<div class="filterbar">
+  <div class="filter-group" id="catFilters">
+    <button class="filter-btn active" data-cat="all">All <span class="count" id="cnt-all">28</span></button>
+    <button class="filter-btn" data-cat="fantasy">Fantasy <span class="count" id="cnt-fantasy">12</span></button>
+    <button class="filter-btn" data-cat="metaphor">Metaphor <span class="count" id="cnt-metaphor">9</span></button>
+    <button class="filter-btn" data-cat="name">Name <span class="count" id="cnt-name">3</span></button>
+    <button class="filter-btn" data-cat="base">Base <span class="count" id="cnt-base">4</span></button>
+  </div>
+  <div class="filter-group">
+    <button class="filter-btn" data-view="shortlist">Shortlist</button>
+    <button class="filter-btn" data-view="rated">Rated</button>
+    <button class="filter-btn" data-view="unrated">Unrated</button>
+  </div>
+  <div class="sort-group">
+    <span class="sort-label">Sort</span>
+    <select class="sort-select" id="sortSelect">
+      <option value="default">By category</option>
+      <option value="rating-desc">Rating ↓</option>
+      <option value="rating-asc">Rating ↑</option>
+      <option value="name-asc">Name A→Z</option>
+      <option value="shortlist">Shortlist first</option>
+    </select>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<main class="content" id="content"></main>
+
+<!-- ACTION BAR -->
+<div class="action-bar">
+  <div class="ab-info">
+    <span>Voting as <span class="voter" id="abVoter">—</span></span>
+    <button class="ab-change" id="btnChangeName">change</button>
+    <span class="dot">·</span>
+    <span>Shortlist <strong id="abCount">0</strong></span>
+    <span class="dot">·</span>
+    <span>Rated <strong id="abRated">0</strong></span>
+  </div>
+  <div class="ab-actions">
+    <button class="btn" id="btnRefresh">Refresh</button>
+    <button class="btn" id="btnCompare">Compare</button>
+    <button class="btn primary" id="btnExport">Export</button>
+    <button class="btn" id="btnReset">Reset mine</button>
+  </div>
+</div>
+
+<!-- NAME MODAL -->
+<div class="modal-bg" id="modalName">
+  <div class="modal">
+    <h2 id="nameModalTitle">Кто голосует?</h2>
+    <p class="modal-sub">Введи имя — оно будет видно команде рядом с твоими заметками. Имя сохранится, второй раз не спросим.</p>
+    <input type="text" class="name-input" id="nameInput" placeholder="Например, Denis K" maxlength="40" autocomplete="off">
+    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+      <button class="btn" id="btnCancelName" style="display: none;">Cancel</button>
+      <button class="btn primary" id="btnSubmitName">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXPORT MODAL -->
+<div class="modal-bg" id="modalExport">
+  <div class="modal wide">
+    <button class="modal-close" onclick="closeExport()">×</button>
+    <h2 id="exportTitle">Summary</h2>
+    <pre class="export-pre" id="exportText"></pre>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn primary" id="btnCopy">Copy to clipboard</button>
+      <button class="btn" id="btnDownloadCsv" style="display: none;">Download CSV (all data)</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARE OVERLAY -->
+<div class="compare-wrap" id="compareWrap">
+  <div class="compare-head">
+    <h2>Shortlist · Compare</h2>
+    <button class="btn" onclick="closeCompare()">Close</button>
+  </div>
+  <div id="compareBody"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+// =========== CONFIG ===========
+const SUPABASE_URL = 'https://lrfbucqyingeieeewtga.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyZmJ1Y3F5aW5nZWllZWV3dGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTE2MjMsImV4cCI6MjA5NTQ2NzYyM30.eAi0PNutR755mm2xlZHBM01eFmbzD3NOm9koJuJ3dQU';
+const ADMIN_CODE = 'naming';
+
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// =========== DATA ===========
+const NAMES = [
+  { id: 'zuno', name: 'Zuno', cat: 'fantasy', domain: 'zuno.com', desc: 'Короткое, динамичное слово с ощущением движения и энергии. Звучит технологично и современно.' },
+  { id: 'verdi', name: 'Verdi', cat: 'fantasy', domain: 'verdi.com', desc: 'Мягкое и уверенное название с ощущением надёжности. Лёгкая ассоциация с «verde» (зелёный) и «verdict» (решение, вывод).' },
+  { id: 'astrad', name: 'Astrad', cat: 'fantasy', domain: 'astrad.com', desc: 'Слияние смыслов «astro» и «trade». Рождает образ навигации в масштабном пространстве. Звучит твёрдо и маскулинно.' },
+  { id: 'auron', name: 'Auron', cat: 'fantasy', domain: 'auron.com', desc: 'Премиальное звучание. Ассоциация с aurum (латинское название золота), но звучит твёрже и увереннее.' },
+  { id: 'oriona', name: 'Oriona', cat: 'fantasy', domain: 'oriona.com', desc: 'Ассоциация с созвездием Орион — ориентиром для путешественников и исследователей. Масштаб и движение по правильному маршруту. Более мягкое, женственное — работает на доверие.' },
+  { id: 'wega', name: 'Wega', cat: 'fantasy', domain: 'wega.com', desc: 'Лёгкое международное слово. Ассоциация со звездой (Vega). Звучит современно.' },
+  { id: 'zirconix', name: 'Zirconix', cat: 'fantasy', domain: 'zirconix.com', desc: 'Футуристичное название с технологическим оттенком. Точность, инновации, что-то надёжное и сложное.' },
+  { id: 'axy', name: 'Axy', cat: 'fantasy', domain: 'axy.com', desc: 'Супер коротко, легко запомнить, легко произнести. Минималистичное.' },
+  { id: 'seempla', name: 'Seempla', cat: 'fantasy', domain: 'seempla.com', desc: 'Похоже на «simple», но не повторяет его напрямую. Даёт ощущение понятности и отсутствия барьеров.' },
+  { id: 'zemmy', name: 'Zemmy', cat: 'fantasy', domain: 'zemmy.com', desc: 'Звонкое «З» даёт динамику, мягкая середина оставляет позитивное и дружелюбное ощущение. Варианты: Zoomie, Zummy (домены тоже свободны).' },
+  { id: 'kubo', name: 'Kubo', cat: 'fantasy', domain: 'kubo.com', desc: 'Простое, сильное и стабильное. Ассоциация с кубом — устойчивое, структурное, надёжное.' },
+  { id: 'selvi', name: 'Selvi', cat: 'fantasy', domain: 'selvi.com', desc: 'Мягкое и современное. Ассоциации с sell. Достаточно мелодичное.' },
+  { id: 'onyx', name: 'Onyx Trade', cat: 'metaphor', domain: 'onyxtrade.com', desc: 'Оникс — прочный полудрагоценный камень. Устойчивость, ценность, надолго. Звучит премиально, коротко и уверенно.' },
+  { id: 'flint', name: 'Flint Trade', cat: 'metaphor', domain: 'flinttrade.com', desc: 'Кремень — материал, из которого рождается искра. Метафора трейдинга: найти возможность и превратить её в движение. Энергично и прочно.' },
+  { id: 'chili', name: 'Chili Trade', cat: 'metaphor', domain: 'chilitrade.com', desc: 'Чили — острота, драйв, эмоции. Звучит живо и сильно выделяется среди серьёзных финансовых брендов.' },
+  { id: 'wasabi', name: 'Wasabi Trade', cat: 'metaphor', domain: 'wasabitrade.com', desc: 'Wasabi — мгновенный эффект, сильное ощущение. Резко включает внимание, не остаётся незамеченным. Подходит для гембловой аудитории.' },
+  { id: 'pulse', name: 'Pulse Trade', cat: 'metaphor', domain: 'pulsetrade.com', desc: 'Короткое и простое. Понятная визуальная ассоциация: графики — это пульс рынка. Легко лечь в основу всей айдентики.' },
+  { id: 'feral', name: 'Feral Trade', cat: 'metaphor', domain: 'feraltrade.com', desc: 'Feral — дикий, свободный, природный инстинкт. Независимость и движение вне правил. Более смелый вариант с характером.' },
+  { id: 'bro', name: 'Bro Traders', cat: 'metaphor', domain: 'brotraders.com', desc: 'Максимально простой и неформальный. Дружелюбие и отсутствие дистанции — словно платформа говорит с тобой на одном языке.' },
+  { id: 'drift', name: 'Drift Trade', cat: 'metaphor', domain: 'drifttrade.com', desc: 'В автоспорте дрифт — контролируемый занос на грани. В море — умелое использование течения. Метафора риска, который находится под полным контролем.' },
+  { id: 'nomad', name: 'Nomad Trade', cat: 'metaphor', domain: 'nomadtrade.com', desc: 'Кочевник — свободен и всегда в движении. Современный образ: digital nomad, независимость. Заход на молодую аудиторию, которая хочет зарабатывать откуда угодно.' },
+  { id: 'jess', name: 'Jess Trade', cat: 'name', domain: 'jesstrade.com', desc: 'Короткое международное имя, читается практически в любой стране. Звучит дружелюбно, современно — не создаёт ощущения сложного финансового продукта.' },
+  { id: 'diya', name: 'Diya Trade', cat: 'name', domain: 'diyatrade.com', desc: 'Популярное женское имя в Индии. Связано со светом и лампой («diya» — традиционный светильник). Тёплое, понятное — словно проводник, который помогает найти путь.' },
+  { id: 'arya', name: 'Arya Trade', cat: 'name', domain: 'aryatrade.com', desc: 'Международно узнаваемое имя с сильным современным звучанием. Самостоятельность, уверенность, движение вперёд. Очень популярное в Индонезии (там — мужское). После «Игры престолов» известно во всём мире.' },
+  { id: 'metrade', name: 'MeTrade', cat: 'base', domain: 'metrade.com', desc: 'Поразительно, но домен metrade.com свободен. Короткий, простой, мгновенно понятный — все слова понятны в любой стране мира. «Me» ставит пользователя в центр, даёт ощущение персонализации.' },
+  { id: 'trade', name: 'tra.de', cat: 'base', domain: 'tra.de', desc: 'Просто слово trade, разбитое точкой. Мгновенно запоминается. Самый короткий домен, который может быть в 2026 году.' },
+  { id: 'tradehub', name: 'Trade Hub', cat: 'base', domain: 'tradehub.com', desc: 'Домен в зоне .com свободен. Не просто брокер, а центр торговой жизни, где всё сходится. Подойдёт, если захотим подчеркнуть роль коммьюнити.' },
+  { id: 'tradester', name: 'Tradester', cat: 'base', domain: 'tradester.net / .app', desc: 'Суффикс -ster превращает действие в персонажа (napster, hipster, roadster). Новая идентичность, не просто трейдер. И эту идентичность создаёт бренд.' },
+];
+
+const CATEGORIES = {
+  fantasy: { title: 'Фантазийные', label: 'Fantasy', desc: 'Несуществующие, изобретённые слова, которые мы сами можем наполнять смыслом во время работы над брендом. Бренд получает максимально гибкую систему смыслов — не привязан к ассоциациям, которые уже есть в голове у пользователя.', num: '01' },
+  metaphor: { title: 'Метафоры: Name + Trade', label: 'Metaphor', desc: 'В отличие от полностью фантазийных названий, здесь бренд уже приходит со встроенной ассоциацией. Это помогает быстрее считывать идею бренда и даёт больше возможностей для визуальной системы, коммуникации и сторителлинга.', num: '02' },
+  name: { title: 'Имя вместо названия', label: 'Name', desc: 'Имя автоматически создаёт ощущение персонализации и близости — человека, который стоит за продуктом. Такой подход снижает дистанцию и может быть особенно полезен для новичков, которым финансовые продукты часто кажутся сложными и безличными.', num: '03' },
+  base: { title: 'Трейдинг — это база', label: 'Base', desc: 'Максимально прямой путь: пользователь сразу понимает, о чём продукт. Не нужно долго объяснять, что можно делать в нашем приложении, и тратить на эти объяснения время и бюджет. Максимально функциональные и простые названия.', num: '04' },
+};
+
+// =========== STATE ===========
+const urlParams = new URLSearchParams(location.search);
+const isAdmin = urlParams.get('admin') === ADMIN_CODE;
+
+let currentVoter = null;
+let myVotes = {};
+let allNotes = [];
+let allVotes = [];
+
+let activeCat = 'all', activeView = null, activeSort = 'default';
+let minVotes = 'half';      // '1' | '2' | '3' | 'half'
+let expandedLbRows = new Set();
+let notesFeedOpen = false;
+
+try { localStorage.removeItem('naming-dashboard-v1'); } catch (e) {}
+
+if (isAdmin) {
+  document.getElementById('adminBadge').style.display = 'inline-block';
+}
+
+// =========== UTILS ===========
+function setDateStamp() {
+  const d = new Date();
+  const m = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  document.getElementById('dateStamp').textContent =
+    `${String(d.getDate()).padStart(2,'0')} ${m[d.getMonth()]} ${d.getFullYear()}`;
+}
+setDateStamp();
+
+function toast(msg, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+// =========== NAME ===========
+function showNameModal(isChange = false) {
+  document.getElementById('nameModalTitle').textContent = isChange ? 'Сменить имя' : 'Кто голосует?';
+  document.getElementById('btnCancelName').style.display = isChange ? 'inline-block' : 'none';
+  document.getElementById('nameInput').value = isChange ? (currentVoter || '') : '';
+  document.getElementById('modalName').classList.add('open');
+  setTimeout(() => document.getElementById('nameInput').focus(), 50);
+}
+
+document.getElementById('btnSubmitName').onclick = async () => {
+  const val = document.getElementById('nameInput').value.trim();
+  if (val.length < 2) { toast('Минимум 2 символа', true); return; }
+  currentVoter = val;
+  localStorage.setItem('voter_name', val);
+  document.getElementById('modalName').classList.remove('open');
+  document.getElementById('abVoter').textContent = val;
+  await loadData();
+  render();
+};
+document.getElementById('nameInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('btnSubmitName').click();
+});
+document.getElementById('btnCancelName').onclick = () => {
+  document.getElementById('modalName').classList.remove('open');
+};
+document.getElementById('btnChangeName').onclick = () => showNameModal(true);
+
+// =========== DATA ===========
+async function loadData() {
+  try {
+    const { data: notes, error: notesErr } = await sb
+      .from('votes')
+      .select('voter_name, name_id, note, updated_at')
+      .not('note', 'is', null).neq('note', '');
+    if (notesErr) throw notesErr;
+    allNotes = notes || [];
+
+    if (isAdmin) {
+      const { data, error } = await sb.from('votes').select('*');
+      if (error) throw error;
+      allVotes = data || [];
+      myVotes = {};
+      (data || []).filter(v => v.voter_name === currentVoter).forEach(v => {
+        myVotes[v.name_id] = { rating: v.rating, shortlist: v.shortlist, note: v.note };
+      });
+    } else {
+      const { data, error } = await sb.from('votes').select('*').eq('voter_name', currentVoter);
+      if (error) throw error;
+      myVotes = {};
+      (data || []).forEach(v => {
+        myVotes[v.name_id] = { rating: v.rating, shortlist: v.shortlist, note: v.note };
+      });
+    }
+  } catch (e) { console.error(e); toast('Не удалось загрузить данные', true); }
+}
+
+async function saveVote(name_id, fields) {
+  const existing = myVotes[name_id] || {};
+  const merged = {
+    voter_name: currentVoter,
+    name_id,
+    rating: 'rating' in fields ? fields.rating : (existing.rating ?? null),
+    shortlist: 'shortlist' in fields ? fields.shortlist : (existing.shortlist ?? false),
+    note: 'note' in fields ? fields.note : (existing.note ?? null),
+    updated_at: new Date().toISOString(),
+  };
+  try {
+    const { error } = await sb.from('votes').upsert(merged, { onConflict: 'voter_name,name_id' });
+    if (error) throw error;
+    // Update local allVotes for admin live recompute
+    if (isAdmin) {
+      const idx = allVotes.findIndex(v => v.voter_name === currentVoter && v.name_id === name_id);
+      if (idx >= 0) Object.assign(allVotes[idx], merged);
+      else allVotes.push({ ...merged });
+      // Notes feed
+      const nIdx = allNotes.findIndex(n => n.voter_name === currentVoter && n.name_id === name_id);
+      if (merged.note) {
+        if (nIdx >= 0) allNotes[nIdx].note = merged.note;
+        else allNotes.push({ voter_name: currentVoter, name_id, note: merged.note, updated_at: merged.updated_at });
+      } else if (nIdx >= 0) {
+        allNotes.splice(nIdx, 1);
+      }
+    } else {
+      // For voter: also update allNotes locally for their own note display elsewhere
+      const nIdx = allNotes.findIndex(n => n.voter_name === currentVoter && n.name_id === name_id);
+      if (merged.note) {
+        if (nIdx >= 0) allNotes[nIdx].note = merged.note;
+        else allNotes.push({ voter_name: currentVoter, name_id, note: merged.note, updated_at: merged.updated_at });
+      } else if (nIdx >= 0) {
+        allNotes.splice(nIdx, 1);
+      }
+    }
+    return true;
+  } catch (e) { console.error(e); toast('Не сохранилось — попробуй ещё раз', true); return false; }
+}
+
+// =========== AGGREGATES ===========
+function getAggregates(name_id) {
+  if (!isAdmin) return null;
+  const votes = allVotes.filter(v => v.name_id === name_id);
+  const rated = votes.filter(v => typeof v.rating === 'number' && v.rating > 0);
+  const shortlisted = votes.filter(v => v.shortlist);
+  if (rated.length === 0) {
+    return { avg: null, voteCount: 0, shortlistCount: shortlisted.length, spread: 0, allRows: votes };
+  }
+  const avg = rated.reduce((s,v) => s + v.rating, 0) / rated.length;
+  const variance = rated.reduce((s,v) => s + Math.pow(v.rating - avg, 2), 0) / rated.length;
+  const spread = Math.sqrt(variance);
+  return { avg, voteCount: rated.length, shortlistCount: shortlisted.length, spread, allRows: votes };
+}
+
+function getAllVoters() {
+  return [...new Set(allVotes.map(v => v.voter_name))].sort();
+}
+
+function getMinVotesNumber() {
+  const total = getAllVoters().length;
+  if (minVotes === 'half') return Math.max(1, Math.ceil(total / 2));
+  return parseInt(minVotes);
+}
+
+function spreadClass(s) {
+  if (s >= 1.2) return 'high';
+  if (s >= 0.7) return 'mid';
+  return 'low';
+}
+
+// =========== RENDER ===========
+function visibleNames() {
+  let list = NAMES.slice();
+  if (activeCat !== 'all') list = list.filter(n => n.cat === activeCat);
+  if (activeView === 'shortlist') list = list.filter(n => myVotes[n.id]?.shortlist);
+  if (activeView === 'rated') list = list.filter(n => myVotes[n.id]?.rating > 0);
+  if (activeView === 'unrated') list = list.filter(n => !myVotes[n.id]?.rating);
+  if (activeSort === 'rating-desc') {
+    if (isAdmin) list.sort((a,b) => (getAggregates(b.id)?.avg||0) - (getAggregates(a.id)?.avg||0));
+    else list.sort((a,b) => (myVotes[b.id]?.rating||0) - (myVotes[a.id]?.rating||0));
+  }
+  if (activeSort === 'rating-asc') {
+    if (isAdmin) list.sort((a,b) => (getAggregates(a.id)?.avg||0) - (getAggregates(b.id)?.avg||0));
+    else list.sort((a,b) => (myVotes[a.id]?.rating||0) - (myVotes[b.id]?.rating||0));
+  }
+  if (activeSort === 'name-asc') list.sort((a,b) => a.name.localeCompare(b.name));
+  if (activeSort === 'shortlist') {
+    list.sort((a,b) => {
+      const av = isAdmin ? (getAggregates(a.id)?.shortlistCount||0) : (myVotes[a.id]?.shortlist?1:0);
+      const bv = isAdmin ? (getAggregates(b.id)?.shortlistCount||0) : (myVotes[b.id]?.shortlist?1:0);
+      return bv - av;
+    });
+  }
+  return list;
+}
+
+function renderStats() {
+  const block = document.getElementById('statsBlock');
+  if (isAdmin) {
+    const voters = getAllVoters();
+    const totalRatings = allVotes.filter(v => v.rating > 0).length;
+    const totalShortlist = allVotes.filter(v => v.shortlist).length;
+    block.innerHTML = `
+      <div class="stat"><div class="stat-label">Всего вариантов</div><div class="stat-val">${NAMES.length}</div></div>
+      <div class="stat"><div class="stat-label">Голосующих</div><div class="stat-val">${voters.length}</div></div>
+      <div class="stat"><div class="stat-label">Всего оценок</div><div class="stat-val">${totalRatings}</div></div>
+      <div class="stat"><div class="stat-label">В шортлистах</div><div class="stat-val">${totalShortlist}</div></div>
+      <div class="stat"><div class="stat-label">Заметок</div><div class="stat-val">${allNotes.length}</div></div>
+    `;
+  } else {
+    const ratedCount = Object.values(myVotes).filter(v => v.rating > 0).length;
+    const shortCount = Object.values(myVotes).filter(v => v.shortlist).length;
+    const ratedVals = Object.values(myVotes).filter(v => v.rating > 0).map(v => v.rating);
+    const avg = ratedVals.length ? (ratedVals.reduce((a,b)=>a+b,0) / ratedVals.length).toFixed(1) : '—';
+    block.innerHTML = `
+      <div class="stat"><div class="stat-label">Всего</div><div class="stat-val">${NAMES.length}</div></div>
+      <div class="stat"><div class="stat-label">Оценено мной</div><div class="stat-val">${ratedCount}<span class="sub">/ ${NAMES.length}</span></div></div>
+      <div class="stat"><div class="stat-label">Мой шортлист</div><div class="stat-val">${shortCount}</div></div>
+      <div class="stat"><div class="stat-label">Мой средний</div><div class="stat-val">${avg}</div></div>
+    `;
+  }
+}
+
+function renderVotersPanel() {
+  const voters = getAllVoters();
+  if (voters.length === 0) {
+    return `<div class="panel">
+      <div class="panel-head"><h3>Voters</h3><span class="meta">Никто ещё не голосовал</span></div>
+    </div>`;
+  }
+  const progress = voters.map(name => {
+    const rated = allVotes.filter(v => v.voter_name === name && v.rating > 0).length;
+    return { name, rated };
+  }).sort((a,b) => b.rated - a.rated);
+  return `<div class="panel">
+    <div class="panel-head">
+      <h3>Voters</h3>
+      <span class="meta">${voters.length} ${voters.length === 1 ? 'голосующий' : 'голосующих'}</span>
+    </div>
+    <div class="voters-list">
+      ${progress.map(v => {
+        const pct = (v.rated / NAMES.length) * 100;
+        const isMe = v.name === currentVoter;
+        return `<div class="voter-row">
+          <div class="voter-name">${escapeHtml(v.name)}${isMe ? '<span class="me">you</span>' : ''}</div>
+          <div class="voter-progress"><div class="voter-progress-fill" style="width: ${pct}%"></div></div>
+          <div class="voter-count"><strong>${v.rated}</strong> / ${NAMES.length}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderLeaderboard() {
+  const minN = getMinVotesNumber();
+  const all = NAMES.map(n => ({ ...n, agg: getAggregates(n.id) }))
+    .filter(r => r.agg && r.agg.avg !== null);
+  const filtered = all.filter(r => r.agg.voteCount >= minN);
+  const rows = filtered.sort((a,b) => b.agg.avg - a.agg.avg).slice(0, 10);
+  const hiddenCount = all.length - filtered.length;
+
+  const voters = getAllVoters();
+  const minOptions = [
+    { v: '1', label: 'Min 1 vote' },
+    { v: '2', label: 'Min 2 votes' },
+    { v: '3', label: 'Min 3 votes' },
+    { v: 'half', label: `Min 50% (${Math.max(1, Math.ceil(voters.length/2))}+)` },
+  ];
+
+  if (rows.length === 0) {
+    return `<div class="panel">
+      <div class="panel-head">
+        <h3>Top by team rating</h3>
+        <div class="panel-controls">
+          <label>Threshold</label>
+          <select id="minVotesSelect">
+            ${minOptions.map(o => `<option value="${o.v}" ${minVotes===o.v?'selected':''}>${o.label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="mini-empty">Никто не прошёл порог — попробуй снизить</div>
+    </div>`;
+  }
+
+  return `<div class="panel">
+    <div class="panel-head">
+      <h3>Top by team rating</h3>
+      <div class="panel-controls">
+        ${hiddenCount > 0 ? `<span class="meta">${hiddenCount} скрыто</span>` : ''}
+        <label>Threshold</label>
+        <select id="minVotesSelect">
+          ${minOptions.map(o => `<option value="${o.v}" ${minVotes===o.v?'selected':''}>${o.label}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    ${rows.map((r,i) => {
+      const expanded = expandedLbRows.has(r.id);
+      // Build per-voter rows
+      const sortedVotes = (r.agg.allRows || []).slice().sort((a,b) => (b.rating||0) - (a.rating||0));
+      const ratedRows = sortedVotes.filter(v => v.rating > 0);
+      const shortOnly = sortedVotes.filter(v => !v.rating && v.shortlist);
+      const detailNotes = allNotes.filter(n => n.name_id === r.id);
+      return `<div class="lb-row ${expanded?'expanded':''}" data-name-id="${r.id}">
+        <div class="lb-main">
+          <div class="lb-rank">${String(i+1).padStart(2,'0')}</div>
+          <div class="lb-name">${r.name}</div>
+          <div class="lb-cat">${CATEGORIES[r.cat].label}</div>
+          <div class="lb-spread ${spreadClass(r.agg.spread)}">±${r.agg.spread.toFixed(1)}</div>
+          <div class="lb-avg">${r.agg.avg.toFixed(1)}</div>
+          <div class="lb-counts">${r.agg.voteCount} v · ${r.agg.shortlistCount} sh</div>
+          <div class="lb-chevron">▾</div>
+        </div>
+        <div class="lb-detail">
+          <div class="lb-detail-section">
+            <div class="lb-detail-label">Кто как поставил</div>
+            ${ratedRows.map(v => `<span class="lb-vote-pill">
+              <span class="vp-name">${escapeHtml(v.voter_name)}</span><span class="vp-rate">${v.rating}★</span>${v.shortlist?'<span class="vp-short">·★</span>':''}
+            </span>`).join('') || '<span style="font-size: 12px; color: var(--text-faint);">— нет оценок —</span>'}
+            ${shortOnly.length ? '<br><br><div class="lb-detail-label" style="margin-top: 4px;">Шортлист без рейтинга</div>' + shortOnly.map(v => `<span class="lb-vote-pill no-rating"><span class="vp-name">${escapeHtml(v.voter_name)}</span><span class="vp-short">★</span></span>`).join('') : ''}
+          </div>
+          ${detailNotes.length ? `<div class="lb-detail-section">
+            <div class="lb-detail-label">Заметки</div>
+            ${detailNotes.map(n => `<div class="lb-detail-note">
+              <span class="lb-note-author">${escapeHtml(n.voter_name)}:</span>${escapeHtml(n.note)}
+            </div>`).join('')}
+          </div>` : ''}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderTopPerCategory() {
+  const cats = ['fantasy','metaphor','name','base'];
+  const rows = cats.map(catKey => {
+    const candidates = NAMES.filter(n => n.cat === catKey)
+      .map(n => ({ ...n, agg: getAggregates(n.id) }))
+      .filter(r => r.agg && r.agg.avg !== null)
+      .sort((a,b) => b.agg.avg - a.agg.avg);
+    return { catKey, leader: candidates[0] || null };
+  });
+  return `<div class="panel">
+    <div class="panel-head"><h3>Top per category</h3><span class="meta">Чемпионы стратегий</span></div>
+    ${rows.map(r => {
+      const cat = CATEGORIES[r.catKey];
+      if (!r.leader) {
+        return `<div class="mini-row">
+          <div class="mini-label">${cat.label}</div>
+          <div class="mini-name" style="color: var(--text-faint);">—</div>
+          <div></div><div></div>
+        </div>`;
+      }
+      return `<div class="mini-row">
+        <div class="mini-label">${cat.label}</div>
+        <div class="mini-name">${r.leader.name}</div>
+        <div class="mini-spread ${spreadClass(r.leader.agg.spread)}">±${r.leader.agg.spread.toFixed(1)}</div>
+        <div class="mini-avg">${r.leader.agg.avg.toFixed(1)}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderMostDivisive() {
+  const rows = NAMES.map(n => ({ ...n, agg: getAggregates(n.id) }))
+    .filter(r => r.agg && r.agg.voteCount >= 2)
+    .sort((a,b) => b.agg.spread - a.agg.spread)
+    .slice(0, 5);
+  if (rows.length === 0) {
+    return `<div class="panel">
+      <div class="panel-head"><h3>Most divisive</h3><span class="meta">Спорные кандидаты</span></div>
+      <div class="mini-empty">Нужно минимум 2 голоса на кандидата</div>
+    </div>`;
+  }
+  return `<div class="panel">
+    <div class="panel-head"><h3>Most divisive</h3><span class="meta">Где разногласия выше</span></div>
+    ${rows.map(r => `<div class="mini-row">
+      <div class="mini-label">${CATEGORIES[r.cat].label}</div>
+      <div class="mini-name">${r.name}</div>
+      <div class="mini-spread ${spreadClass(r.agg.spread)}">±${r.agg.spread.toFixed(1)}</div>
+      <div class="mini-avg">${r.agg.avg.toFixed(1)}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function renderNotesFeed() {
+  const byName = {};
+  allNotes.forEach(nt => {
+    if (!byName[nt.name_id]) byName[nt.name_id] = [];
+    byName[nt.name_id].push(nt);
+  });
+  const groups = NAMES.map(n => ({ ...n, notes: byName[n.id] || [] }))
+    .filter(n => n.notes.length > 0);
+
+  return `<div class="panel">
+    <button class="feed-toggle ${notesFeedOpen?'open':''}" id="feedToggle">
+      <span>All notes <span style="color: var(--text-faint); font-weight: 400;">(${allNotes.length})</span></span>
+      <span class="chev">▾</span>
+    </button>
+    <div class="feed-body ${notesFeedOpen?'open':''}">
+      ${groups.length === 0 ? '<div class="mini-empty">Пока нет заметок</div>' : groups.map(g => `
+        <div class="feed-group">
+          <div class="feed-group-name">${g.name}<span class="feed-cat">${CATEGORIES[g.cat].label}</span></div>
+          ${g.notes.map(nt => `<div class="feed-note">
+            <span class="feed-author">${escapeHtml(nt.voter_name)}:</span>${escapeHtml(nt.note)}
+          </div>`).join('')}
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function renderAdminPanels() {
+  const slot = document.getElementById('adminPanels');
+  if (!isAdmin) { slot.innerHTML = ''; return; }
+  slot.innerHTML = `
+    ${renderVotersPanel()}
+    ${renderLeaderboard()}
+    <div class="panels-row">
+      ${renderTopPerCategory()}
+      ${renderMostDivisive()}
+    </div>
+    ${renderNotesFeed()}
+  `;
+  bindAdminEvents();
+}
+
+function bindAdminEvents() {
+  const sel = document.getElementById('minVotesSelect');
+  if (sel) {
+    sel.onchange = (e) => {
+      minVotes = e.target.value;
+      renderAdminPanels();
+    };
+  }
+  document.querySelectorAll('.lb-row').forEach(row => {
+    row.querySelector('.lb-main').onclick = () => {
+      const id = row.dataset.nameId;
+      if (expandedLbRows.has(id)) expandedLbRows.delete(id);
+      else expandedLbRows.add(id);
+      row.classList.toggle('expanded');
+    };
+  });
+  const feedBtn = document.getElementById('feedToggle');
+  if (feedBtn) {
+    feedBtn.onclick = () => {
+      notesFeedOpen = !notesFeedOpen;
+      feedBtn.classList.toggle('open');
+      document.querySelector('.feed-body').classList.toggle('open');
+    };
+  }
+}
+
+function cardHTML(n) {
+  const mine = myVotes[n.id] || {};
+  const rating = mine.rating || 0;
+  const isShort = !!mine.shortlist;
+  const myNote = mine.note || '';
+
+  const ratingDots = [1,2,3,4,5].map(i =>
+    `<button class="rating-dot ${i<=rating?'filled':''}" data-rate="${i}" data-id="${n.id}">${i}</button>`
+  ).join('');
+
+  let adminStat = '';
+  if (isAdmin) {
+    const agg = getAggregates(n.id);
+    if (agg && agg.voteCount > 0) {
+      adminStat = `<div class="card-admin-stat">
+        Team: <strong>${agg.avg.toFixed(1)}</strong> avg · ±${agg.spread.toFixed(1)} spread · ${agg.voteCount} ${agg.voteCount === 1 ? 'vote' : 'votes'} · ${agg.shortlistCount} in shortlist
+      </div>`;
+    } else {
+      adminStat = `<div class="card-admin-stat"><span class="none">No team votes yet</span></div>`;
+    }
+  }
+
+  const otherNotes = allNotes.filter(nt => nt.name_id === n.id && nt.voter_name !== currentVoter && nt.note);
+  let teamNotes = '';
+  if (otherNotes.length > 0) {
+    teamNotes = `<div class="team-notes">
+      <div class="team-notes-label">Team notes <span class="cnt">${otherNotes.length}</span></div>
+      ${otherNotes.map(nt => `<div class="team-note-item">
+        <span class="team-note-author">${escapeHtml(nt.voter_name)}:</span>${escapeHtml(nt.note)}
+      </div>`).join('')}
+    </div>`;
+  }
+
+  return `
+    <div class="card ${isShort ? 'shortlisted' : ''}" data-id="${n.id}">
+      <div class="card-top">
+        <span class="card-tag">${CATEGORIES[n.cat].label}</span>
+        <button class="card-shortlist ${isShort?'active':''}" data-short="${n.id}" aria-label="shortlist">★</button>
+      </div>
+      <div class="card-name">${n.name}</div>
+      <div class="card-domain">${n.domain}<span class="ok">free</span></div>
+      <p class="card-desc">${n.desc}</p>
+      ${adminStat}
+      <div class="rating">${ratingDots}</div>
+      <div class="note-block">
+        <button class="note-toggle ${myNote?'has-note':''}" data-note-toggle="${n.id}">
+          ${myNote ? 'My note · edit' : '+ Add my note'}
+        </button>
+        <div class="note-field ${myNote?'open':''}" id="note-${n.id}">
+          <textarea class="note-input" data-note="${n.id}" placeholder="Заметка, аргумент, риск...">${escapeHtml(myNote)}</textarea>
+          <div class="note-actions">
+            <button class="note-save" data-save="${n.id}">Save</button>
+            <span class="note-status" id="note-status-${n.id}"></span>
+            <span class="note-hint">⌘+Enter</span>
+          </div>
+        </div>
+      </div>
+      ${teamNotes}
+    </div>
+  `;
+}
+
+function render() {
+  const list = visibleNames();
+  const groupByCat = activeSort === 'default';
+  const content = document.getElementById('content');
+
+  if (list.length === 0) {
+    content.innerHTML = `<div style="text-align:center;padding:80px 0;color:var(--text-dim);font-size:13px;">No matches in this view</div>`;
+  } else if (groupByCat) {
+    let html = '';
+    const cats = activeCat === 'all' ? ['fantasy','metaphor','name','base'] : [activeCat];
+    cats.forEach(catKey => {
+      const inCat = list.filter(n => n.cat === catKey);
+      if (inCat.length === 0) return;
+      const cat = CATEGORIES[catKey];
+      html += `<section class="category-section">
+        <div class="cat-header">
+          <div class="cat-header-top">
+            <span class="cat-num">${cat.num} / 04</span>
+            <h2 class="cat-title">${cat.title}</h2>
+          </div>
+          <p class="cat-desc">${cat.desc}</p>
+        </div>
+        <div class="grid">${inCat.map(cardHTML).join('')}</div>
+      </section>`;
+    });
+    content.innerHTML = html;
+  } else {
+    content.innerHTML = `<div class="grid">${list.map(cardHTML).join('')}</div>`;
+  }
+
+  renderStats();
+  renderAdminPanels();
+  updateActionBar();
+  bindCardEvents();
+}
+
+function updateActionBar() {
+  const ratedCount = Object.values(myVotes).filter(v => v.rating > 0).length;
+  const shortCount = Object.values(myVotes).filter(v => v.shortlist).length;
+  document.getElementById('abCount').textContent = shortCount;
+  document.getElementById('abRated').textContent = ratedCount;
+}
+
+function bindCardEvents() {
+  document.querySelectorAll('[data-rate]').forEach(el => {
+    el.onclick = async () => {
+      const id = el.dataset.id;
+      const val = parseInt(el.dataset.rate);
+      const current = myVotes[id]?.rating || 0;
+      const newRating = current === val ? null : val;
+      myVotes[id] = myVotes[id] || {};
+      myVotes[id].rating = newRating;
+      // Optimistic UI: update just the dots and admin stat locally
+      render();
+      await saveVote(id, { rating: newRating });
+      if (isAdmin) render();
+    };
+  });
+
+  document.querySelectorAll('[data-short]').forEach(el => {
+    el.onclick = async () => {
+      const id = el.dataset.short;
+      myVotes[id] = myVotes[id] || {};
+      myVotes[id].shortlist = !myVotes[id].shortlist;
+      render();
+      await saveVote(id, { shortlist: myVotes[id].shortlist });
+      if (isAdmin) render();
+    };
+  });
+
+  document.querySelectorAll('[data-note-toggle]').forEach(el => {
+    el.onclick = () => {
+      const id = el.dataset.noteToggle;
+      const field = document.getElementById('note-' + id);
+      field.classList.toggle('open');
+      if (field.classList.contains('open')) field.querySelector('textarea').focus();
+    };
+  });
+
+  // Note input: track dirty state, don't save
+  document.querySelectorAll('[data-note]').forEach(el => {
+    el.oninput = () => {
+      const id = el.dataset.note;
+      const saved = (myVotes[id]?.note) || '';
+      const saveBtn = document.querySelector(`[data-save="${id}"]`);
+      const status = document.getElementById('note-status-' + id);
+      if (el.value !== saved) {
+        saveBtn.classList.add('dirty');
+        saveBtn.textContent = 'Save';
+        status.className = 'note-status';
+        status.textContent = '';
+      } else {
+        saveBtn.classList.remove('dirty');
+      }
+    };
+    el.onkeydown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        const id = el.dataset.note;
+        document.querySelector(`[data-save="${id}"]`)?.click();
+      }
+    };
+  });
+
+  // Save button
+  document.querySelectorAll('[data-save]').forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.dataset.save;
+      const textarea = document.querySelector(`[data-note="${id}"]`);
+      const value = textarea.value.trim();
+      const status = document.getElementById('note-status-' + id);
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      status.className = 'note-status';
+      status.textContent = '';
+
+      myVotes[id] = myVotes[id] || {};
+      myVotes[id].note = value || null;
+
+      const ok = await saveVote(id, { note: value || null });
+      btn.disabled = false;
+
+      if (ok) {
+        btn.textContent = 'Save';
+        btn.classList.remove('dirty');
+        status.className = 'note-status saved';
+        status.textContent = '✓ Saved';
+        // Update toggle label
+        const toggle = document.querySelector(`[data-note-toggle="${id}"]`);
+        if (toggle) {
+          if (value) { toggle.classList.add('has-note'); toggle.textContent = 'My note · edit'; }
+          else { toggle.classList.remove('has-note'); toggle.textContent = '+ Add my note'; }
+        }
+        setTimeout(() => {
+          if (status.textContent === '✓ Saved') {
+            status.className = 'note-status';
+            status.textContent = '';
+          }
+        }, 2000);
+        if (isAdmin) render(); // refresh admin panels with new note
+      } else {
+        btn.textContent = 'Save';
+        status.className = 'note-status error';
+        status.textContent = 'Error';
+      }
+    };
+  });
+}
+
+// =========== FILTERS ===========
+document.querySelectorAll('[data-cat]').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('[data-cat]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    render();
+  };
+});
+document.querySelectorAll('[data-view]').forEach(btn => {
+  btn.onclick = () => {
+    const v = btn.dataset.view;
+    if (activeView === v) { activeView = null; btn.classList.remove('active'); }
+    else {
+      document.querySelectorAll('[data-view]').forEach(b => b.classList.remove('active'));
+      activeView = v; btn.classList.add('active');
+    }
+    render();
+  };
+});
+document.getElementById('sortSelect').onchange = (e) => { activeSort = e.target.value; render(); };
+
+// =========== REFRESH ===========
+document.getElementById('btnRefresh').onclick = async () => {
+  const btn = document.getElementById('btnRefresh');
+  btn.disabled = true; btn.textContent = 'Loading...';
+  await loadData(); render();
+  btn.textContent = 'Refresh'; btn.disabled = false;
+  toast('Обновлено');
+};
+
+// =========== EXPORT ===========
+function buildExportText() {
+  const lines = [];
+  const ts = new Date().toLocaleString('ru-RU');
+  if (isAdmin) {
+    lines.push('TEAM EVALUATION · ' + ts);
+    lines.push('==================================================');
+    lines.push('');
+    const voters = getAllVoters();
+    lines.push(`VOTERS (${voters.length})`);
+    lines.push('--------------------------------------------------');
+    voters.forEach(v => {
+      const rated = allVotes.filter(x => x.voter_name === v && x.rating > 0).length;
+      lines.push(`  ${v.padEnd(20)} ${rated}/${NAMES.length} rated`);
+    });
+    lines.push('');
+
+    const minN = getMinVotesNumber();
+    const ranked = NAMES.map(n => ({ ...n, agg: getAggregates(n.id) }))
+      .filter(r => r.agg && r.agg.avg !== null && r.agg.voteCount >= minN)
+      .sort((a,b) => b.agg.avg - a.agg.avg);
+    if (ranked.length) {
+      lines.push(`LEADERBOARD (min ${minN} votes)`);
+      lines.push('--------------------------------------------------');
+      ranked.forEach((r,i) => {
+        lines.push(`${String(i+1).padStart(2)}. ${r.name.padEnd(16)} ${r.agg.avg.toFixed(1)} avg · ±${r.agg.spread.toFixed(1)} spread · ${r.agg.voteCount} votes · ${r.agg.shortlistCount} sh · ${CATEGORIES[r.cat].label}`);
+      });
+      lines.push('');
+    }
+
+    const divisive = NAMES.map(n => ({ ...n, agg: getAggregates(n.id) }))
+      .filter(r => r.agg && r.agg.voteCount >= 2)
+      .sort((a,b) => b.agg.spread - a.agg.spread).slice(0, 5);
+    if (divisive.length) {
+      lines.push('MOST DIVISIVE');
+      lines.push('--------------------------------------------------');
+      divisive.forEach(r => lines.push(`  ${r.name.padEnd(16)} ±${r.agg.spread.toFixed(1)} (avg ${r.agg.avg.toFixed(1)})`));
+      lines.push('');
+    }
+
+    lines.push('TOP PER CATEGORY');
+    lines.push('--------------------------------------------------');
+    ['fantasy','metaphor','name','base'].forEach(catKey => {
+      const cat = CATEGORIES[catKey];
+      const best = NAMES.filter(n => n.cat === catKey)
+        .map(n => ({ ...n, agg: getAggregates(n.id) }))
+        .filter(r => r.agg && r.agg.avg !== null)
+        .sort((a,b) => b.agg.avg - a.agg.avg)[0];
+      if (best) lines.push(`  ${cat.label.padEnd(12)} ${best.name.padEnd(16)} ${best.agg.avg.toFixed(1)} avg · ${best.agg.voteCount} votes`);
+      else lines.push(`  ${cat.label.padEnd(12)} —`);
+    });
+    lines.push('');
+
+    if (allNotes.length) {
+      lines.push('ALL NOTES');
+      lines.push('--------------------------------------------------');
+      const byName = {};
+      allNotes.forEach(nt => { if (!byName[nt.name_id]) byName[nt.name_id]=[]; byName[nt.name_id].push(nt); });
+      NAMES.forEach(n => {
+        if (byName[n.id]) {
+          lines.push(`  [${n.name}]`);
+          byName[n.id].forEach(nt => lines.push(`    ${nt.voter_name}: ${nt.note}`));
+          lines.push('');
+        }
+      });
+    }
+  } else {
+    lines.push(`MY VOTES · ${currentVoter} · ${ts}`);
+    lines.push('==================================================');
+    lines.push('');
+    const short = NAMES.filter(n => myVotes[n.id]?.shortlist);
+    if (short.length) {
+      lines.push(`MY SHORTLIST (${short.length})`);
+      lines.push('--------------------------------------------------');
+      short.sort((a,b) => (myVotes[b.id]?.rating||0) - (myVotes[a.id]?.rating||0));
+      short.forEach(n => {
+        const r = myVotes[n.id]?.rating || 0;
+        const stars = r ? '★'.repeat(r) + '·'.repeat(5-r) : '— not rated —';
+        lines.push(`  ${n.name}  [${stars}]  · ${CATEGORIES[n.cat].label}`);
+        if (myVotes[n.id]?.note) lines.push(`  note: ${myVotes[n.id].note}`);
+        lines.push('');
+      });
+    }
+    const topRated = NAMES.filter(n => !myVotes[n.id]?.shortlist && (myVotes[n.id]?.rating||0) >= 4);
+    if (topRated.length) {
+      lines.push('HIGH-RATED · NOT IN SHORTLIST');
+      lines.push('--------------------------------------------------');
+      topRated.sort((a,b) => (myVotes[b.id]?.rating||0) - (myVotes[a.id]?.rating||0));
+      topRated.forEach(n => {
+        lines.push(`  ${n.name}  (${myVotes[n.id].rating}★)  · ${CATEGORIES[n.cat].label}`);
+        if (myVotes[n.id]?.note) lines.push(`  note: ${myVotes[n.id].note}`);
+      });
+      lines.push('');
+    }
+    const rejected = NAMES.filter(n => (myVotes[n.id]?.rating||0) > 0 && myVotes[n.id].rating <= 2);
+    if (rejected.length) {
+      lines.push('REJECTED (1-2★)');
+      lines.push('--------------------------------------------------');
+      rejected.forEach(n => {
+        lines.push(`  ${n.name}  (${myVotes[n.id].rating}★)`);
+        if (myVotes[n.id]?.note) lines.push(`     ↳ ${myVotes[n.id].note}`);
+      });
+      lines.push('');
+    }
+    const ratedCount = Object.values(myVotes).filter(v => v.rating > 0).length;
+    const ratedVals = Object.values(myVotes).filter(v => v.rating > 0).map(v => v.rating);
+    const avg = ratedVals.length ? (ratedVals.reduce((a,b)=>a+b,0) / ratedVals.length).toFixed(1) : '—';
+    lines.push('SUMMARY');
+    lines.push('--------------------------------------------------');
+    lines.push(`  Rated:              ${ratedCount} / ${NAMES.length}`);
+    lines.push(`  In my shortlist:    ${short.length}`);
+    lines.push(`  Average:            ${avg}`);
+  }
+  return lines.join('\n');
+}
+
+document.getElementById('btnExport').onclick = async () => {
+  if (isAdmin) await loadData();
+  document.getElementById('exportTitle').textContent = isAdmin ? 'Team summary' : 'My votes';
+  document.getElementById('exportText').textContent = buildExportText();
+  document.getElementById('btnDownloadCsv').style.display = isAdmin ? 'inline-block' : 'none';
+  document.getElementById('modalExport').classList.add('open');
+};
+window.closeExport = () => document.getElementById('modalExport').classList.remove('open');
+
+document.getElementById('btnCopy').onclick = () => {
+  const text = document.getElementById('exportText').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btnCopy');
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+};
+
+document.getElementById('btnDownloadCsv').onclick = () => {
+  const header = ['voter_name','name_id','name','category','rating','shortlist','note','updated_at'];
+  const escape = (s) => {
+    if (s === null || s === undefined) return '';
+    const str = String(s).replace(/"/g, '""');
+    return /[,"\n]/.test(str) ? `"${str}"` : str;
+  };
+  const rows = allVotes.map(v => {
+    const n = NAMES.find(x => x.id === v.name_id);
+    return [
+      v.voter_name, v.name_id,
+      n ? n.name : v.name_id,
+      n ? CATEGORIES[n.cat].label : '',
+      v.rating ?? '', v.shortlist ? 'true' : 'false',
+      v.note || '', v.updated_at || v.created_at || '',
+    ].map(escape).join(',');
+  });
+  const csv = [header.join(','), ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `naming-votes-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// =========== COMPARE ===========
+document.getElementById('btnCompare').onclick = () => {
+  const short = NAMES.filter(n => myVotes[n.id]?.shortlist);
+  const body = document.getElementById('compareBody');
+  if (short.length === 0) {
+    body.innerHTML = '<div class="compare-empty">Шортлист пуст. Отметь варианты звёздочкой и возвращайся.</div>';
+  } else {
+    const cols = Math.min(short.length, 4);
+    body.innerHTML = `<div class="compare-grid cols-${cols}">${short.map(n => {
+      const r = myVotes[n.id]?.rating || 0;
+      const note = myVotes[n.id]?.note || '';
+      return `<div class="compare-cell">
+        <span class="card-tag">${CATEGORIES[n.cat].label}</span>
+        <div class="card-name">${n.name}</div>
+        <div class="card-domain">${n.domain}<span class="ok">free</span></div>
+        <div class="rating" style="margin-top: 18px;">
+          ${[1,2,3,4,5].map(i => `<div class="rating-dot ${i<=r?'filled':''}">${i}</div>`).join('')}
+        </div>
+        <p class="card-desc" style="margin-top: 18px; flex: 1;">${n.desc}</p>
+        ${note ? `<div class="note-box"><div class="note-box-label">My note</div>${escapeHtml(note)}</div>` : ''}
+      </div>`;
+    }).join('')}</div>`;
+  }
+  document.getElementById('compareWrap').classList.add('open');
+};
+window.closeCompare = () => document.getElementById('compareWrap').classList.remove('open');
+
+// =========== RESET ===========
+document.getElementById('btnReset').onclick = async () => {
+  if (!confirm('Сбросить все МОИ оценки, шортлист и заметки? (Голоса других не затронуты)')) return;
+  try {
+    const { error } = await sb.from('votes').delete().eq('voter_name', currentVoter);
+    if (error) throw error;
+    myVotes = {};
+    await loadData(); render();
+    toast('Сброшено');
+  } catch (e) { console.error(e); toast('Не удалось сбросить', true); }
+};
+
+// =========== BOOT ===========
+async function boot() {
+  const saved = localStorage.getItem('voter_name');
+  if (saved && saved.trim().length >= 2) {
+    currentVoter = saved.trim();
+    document.getElementById('abVoter').textContent = currentVoter;
+    await loadData();
+    render();
+  } else {
+    render();
+    showNameModal(false);
+  }
+}
+boot();
+</script>
+</body>
+</html>
