@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Результаты голосования / Naming</title>
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=switzer@200,300,400,500,600,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0d0c;
+    --bg-elev: #141311;
+    --surface: #1a1916;
+    --border: #232120;
+    --border-mid: #2d2b29;
+    --border-strong: #3a3835;
+    --text: #e8e3d6;
+    --text-dim: #807a6e;
+    --text-faint: #4a463f;
+    --accent: #c9b98e;
+    --accent-soft: rgba(201, 185, 142, 0.10);
+    --font: 'Switzer', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+    --gutter: 48px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--font); -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-weight: 400; font-size: 14px; line-height: 1.5; letter-spacing: -0.005em;
+  }
+  body { min-height: 100vh; padding-bottom: 80px; }
+  button { font-family: inherit; }
+
+  /* HEADER */
+  .head { padding: 64px var(--gutter) 48px; border-bottom: 1px solid var(--border); }
+  .head-top {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 24px; flex-wrap: wrap; margin-bottom: 48px;
+  }
+  .brand {
+    font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); font-weight: 500;
+  }
+  .head-date {
+    font-size: 11px; color: var(--text-faint);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  h1 {
+    font-weight: 300; font-size: clamp(36px, 5vw, 64px);
+    line-height: 1.02; letter-spacing: -0.03em; max-width: 16ch; color: var(--text);
+  }
+  h1 .light { color: var(--text-dim); }
+  .summary-line {
+    margin-top: 28px; display: flex; gap: 40px; flex-wrap: wrap;
+  }
+  .summary-item { }
+  .summary-num {
+    font-size: 28px; font-weight: 300; color: var(--text);
+    letter-spacing: -0.02em; line-height: 1;
+  }
+  .summary-label {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 500; margin-top: 6px;
+  }
+
+  /* SECTION */
+  .section { padding: 56px var(--gutter); border-bottom: 1px solid var(--border); }
+  .section:last-of-type { border-bottom: none; }
+  .section-head {
+    display: flex; align-items: baseline; gap: 16px;
+    margin-bottom: 32px;
+  }
+  .section-num {
+    font-size: 11px; color: var(--text-faint);
+    letter-spacing: 0.14em; font-weight: 500;
+  }
+  .section-title {
+    font-weight: 400; font-size: 24px; letter-spacing: -0.018em; color: var(--text);
+  }
+  .section-sub {
+    margin-left: auto; font-size: 13px; color: var(--text-dim);
+    max-width: 44ch; text-align: right;
+  }
+
+  /* PODIUM */
+  .podium {
+    display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 16px;
+    align-items: end;
+  }
+  .podium-card {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 8px; padding: 28px 24px;
+    display: flex; flex-direction: column;
+  }
+  .podium-card.first {
+    background: linear-gradient(180deg, var(--accent-soft), var(--bg-elev) 70%);
+    border-color: var(--accent);
+    padding: 40px 28px;
+  }
+  .podium-rank {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.14em;
+    color: var(--text-faint); margin-bottom: 16px;
+    font-variant-numeric: tabular-nums;
+  }
+  .podium-card.first .podium-rank { color: var(--accent); }
+  .podium-name {
+    font-size: 32px; font-weight: 400; letter-spacing: -0.025em;
+    color: var(--text); line-height: 1.05; margin-bottom: 4px;
+    word-break: break-word;
+  }
+  .podium-card.first .podium-name { font-size: 44px; }
+  .podium-cat {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 500; margin-bottom: 20px;
+  }
+  .podium-score {
+    font-size: 40px; font-weight: 300; color: var(--accent);
+    letter-spacing: -0.02em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .podium-card.first .podium-score { font-size: 56px; }
+  .podium-score .out { font-size: 16px; color: var(--text-faint); margin-left: 2px; }
+  .podium-meta {
+    margin-top: 14px; font-size: 12px; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* RANKING */
+  .controls { display: flex; gap: 6px; margin-bottom: 24px; }
+  .ctrl-btn {
+    font-size: 12px; padding: 7px 13px; background: transparent;
+    color: var(--text-dim); border: 1px solid var(--border-mid);
+    cursor: pointer; border-radius: 4px; font-family: inherit;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .ctrl-btn:hover { color: var(--text); }
+  .ctrl-btn.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+
+  .rank-row {
+    display: grid;
+    grid-template-columns: 36px 160px 1fr 56px 80px;
+    gap: 20px; align-items: center;
+    padding: 14px 0; border-bottom: 1px solid var(--border);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-pos {
+    font-size: 13px; color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .rank-name {
+    font-size: 15px; color: var(--text);
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .rank-name .rank-cat {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 500;
+  }
+  .rank-bar-wrap {
+    height: 8px; background: var(--border); border-radius: 4px; overflow: hidden;
+  }
+  .rank-bar {
+    height: 100%; background: var(--accent); border-radius: 4px;
+    transition: width 0.4s ease;
+  }
+  .rank-score {
+    font-size: 15px; color: var(--accent); font-weight: 500;
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+  .rank-votes {
+    font-size: 12px; color: var(--text-dim);
+    text-align: right; font-variant-numeric: tabular-nums;
+  }
+
+  /* SHORTLIST BARS */
+  .sl-row {
+    display: grid; grid-template-columns: 160px 1fr 60px;
+    gap: 20px; align-items: center;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .sl-row:last-child { border-bottom: none; }
+  .sl-name { font-size: 15px; color: var(--text); }
+  .sl-name .sl-cat {
+    font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--text-faint); margin-left: 8px; font-weight: 500;
+  }
+  .sl-bar-wrap { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .sl-bar { height: 100%; background: var(--accent); border-radius: 4px; }
+  .sl-count {
+    font-size: 13px; color: var(--text); text-align: right;
+    font-variant-numeric: tabular-nums; font-weight: 500;
+  }
+  .sl-count .sl-unit { color: var(--text-faint); font-weight: 400; font-size: 11px; }
+
+  /* CATEGORIES */
+  .cat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 700px) { .cat-grid { grid-template-columns: 1fr; } }
+  .cat-card {
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px;
+  }
+  .cat-card-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  }
+  .cat-card-name { font-size: 16px; color: var(--text); font-weight: 400; }
+  .cat-card-avg {
+    font-size: 13px; color: var(--text-dim); font-variant-numeric: tabular-nums;
+  }
+  .cat-card-avg strong { color: var(--accent); font-weight: 500; }
+  .cat-leader-label {
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 500; margin-bottom: 8px;
+  }
+  .cat-leader-name {
+    font-size: 24px; font-weight: 400; letter-spacing: -0.02em; color: var(--text);
+  }
+  .cat-leader-score {
+    font-size: 13px; color: var(--accent); margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* NOTES */
+  .notes-group {
+    padding: 20px 0; border-bottom: 1px solid var(--border);
+  }
+  .notes-group:last-child { border-bottom: none; }
+  .notes-group-head {
+    display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px;
+  }
+  .notes-group-name { font-size: 18px; color: var(--text); font-weight: 400; }
+  .notes-group-cat {
+    font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-faint); font-weight: 500;
+  }
+  .notes-group-score {
+    margin-left: auto; font-size: 13px; color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .note-card {
+    padding: 12px 16px; margin-bottom: 8px;
+    background: var(--bg-elev); border-left: 2px solid var(--accent);
+    border-radius: 0 4px 4px 0; font-size: 13px; line-height: 1.55;
+    color: var(--text-dim);
+  }
+  .note-card:last-child { margin-bottom: 0; }
+  .note-card .note-author {
+    color: var(--accent); font-weight: 500; margin-right: 6px;
+  }
+
+  /* EMPTY / LOADING */
+  .state-msg {
+    text-align: center; padding: 120px 20px;
+    color: var(--text-dim); font-size: 14px;
+  }
+  .state-msg .spinner {
+    width: 24px; height: 24px; border: 2px solid var(--border-strong);
+    border-top-color: var(--accent); border-radius: 50%;
+    margin: 0 auto 20px; animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* REFRESH BAR */
+  .refresh-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: rgba(20, 19, 17, 0.94); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-mid); padding: 12px var(--gutter);
+    display: flex; align-items: center; gap: 12px; z-index: 60;
+  }
+  .refresh-info { font-size: 12px; color: var(--text-dim); }
+  .refresh-info strong { color: var(--text); }
+  .refresh-actions { margin-left: auto; display: flex; gap: 8px; }
+  .btn {
+    font-size: 12px; padding: 8px 14px; background: transparent;
+    color: var(--text); border: 1px solid var(--border-mid);
+    cursor: pointer; border-radius: 4px; font-family: inherit;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn:hover { border-color: var(--border-strong); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  @media (max-width: 900px) {
+    :root { --gutter: 24px; }
+    .podium { grid-template-columns: 1fr; }
+    .podium-card.first { order: -1; }
+    .section-sub { display: none; }
+    .rank-row { grid-template-columns: 28px 1fr 50px 56px; }
+    .rank-bar-wrap { display: none; }
+    .sl-row { grid-template-columns: 1fr 50px; }
+    .sl-bar-wrap { display: none; }
+  }
+
+  @media print {
+    .refresh-bar { display: none; }
+    body { padding-bottom: 0; background: #fff; color: #000; }
+    .section { page-break-inside: avoid; }
+  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  ::selection { background: var(--accent); color: var(--bg); }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="state-msg">
+    <div class="spinner"></div>
+    Загружаем результаты…
+  </div>
+</div>
+
+<div class="refresh-bar">
+  <div class="refresh-info">Данные на <strong id="loadedAt">—</strong></div>
+  <div class="refresh-actions">
+    <button class="btn" id="btnPrint">Print / PDF</button>
+    <button class="btn" id="btnRefresh">Обновить</button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = 'https://lrfbucqyingeieeewtga.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxyZmJ1Y3F5aW5nZWllZWV3dGdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTE2MjMsImV4cCI6MjA5NTQ2NzYyM30.eAi0PNutR755mm2xlZHBM01eFmbzD3NOm9koJuJ3dQU';
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const NAMES = [
+  { id: 'zuno', name: 'Zuno', cat: 'fantasy' },
+  { id: 'verdi', name: 'Verdi', cat: 'fantasy' },
+  { id: 'astrad', name: 'Astrad', cat: 'fantasy' },
+  { id: 'auron', name: 'Auron', cat: 'fantasy' },
+  { id: 'oriona', name: 'Oriona', cat: 'fantasy' },
+  { id: 'wega', name: 'Wega', cat: 'fantasy' },
+  { id: 'zirconix', name: 'Zirconix', cat: 'fantasy' },
+  { id: 'axy', name: 'Axy', cat: 'fantasy' },
+  { id: 'seempla', name: 'Seempla', cat: 'fantasy' },
+  { id: 'zemmy', name: 'Zemmy', cat: 'fantasy' },
+  { id: 'kubo', name: 'Kubo', cat: 'fantasy' },
+  { id: 'selvi', name: 'Selvi', cat: 'fantasy' },
+  { id: 'onyx', name: 'Onyx Trade', cat: 'metaphor' },
+  { id: 'flint', name: 'Flint Trade', cat: 'metaphor' },
+  { id: 'chili', name: 'Chili Trade', cat: 'metaphor' },
+  { id: 'wasabi', name: 'Wasabi Trade', cat: 'metaphor' },
+  { id: 'pulse', name: 'Pulse Trade', cat: 'metaphor' },
+  { id: 'feral', name: 'Feral Trade', cat: 'metaphor' },
+  { id: 'bro', name: 'Bro Traders', cat: 'metaphor' },
+  { id: 'drift', name: 'Drift Trade', cat: 'metaphor' },
+  { id: 'nomad', name: 'Nomad Trade', cat: 'metaphor' },
+  { id: 'jess', name: 'Jess Trade', cat: 'name' },
+  { id: 'diya', name: 'Diya Trade', cat: 'name' },
+  { id: 'arya', name: 'Arya Trade', cat: 'name' },
+  { id: 'metrade', name: 'MeTrade', cat: 'base' },
+  { id: 'trade', name: 'tra.de', cat: 'base' },
+  { id: 'tradehub', name: 'Trade Hub', cat: 'base' },
+  { id: 'tradester', name: 'Tradester', cat: 'base' },
+];
+const CAT_LABEL = { fantasy: 'Fantasy', metaphor: 'Metaphor', name: 'Name', base: 'Base' };
+const CAT_TITLE = { fantasy: 'Фантазийные', metaphor: 'Метафоры', name: 'Имена', base: 'Прямые' };
+
+let allVotes = [];
+let allNotes = [];
+let rankSort = 'rating'; // 'rating' | 'shortlist'
+
+function escapeHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+function agg(name_id) {
+  const votes = allVotes.filter(v => v.name_id === name_id);
+  const rated = votes.filter(v => typeof v.rating === 'number' && v.rating > 0);
+  const shortlisted = votes.filter(v => v.shortlist);
+  const avg = rated.length ? rated.reduce((s,v) => s + v.rating, 0) / rated.length : null;
+  return { avg, voteCount: rated.length, shortlistCount: shortlisted.length };
+}
+
+function getVoters() {
+  return [...new Set(allVotes.map(v => v.voter_name))];
+}
+
+async function load() {
+  try {
+    const { data, error } = await sb.from('votes').select('*');
+    if (error) throw error;
+    allVotes = data || [];
+    allNotes = allVotes.filter(v => v.note && v.note.trim());
+    const d = new Date();
+    document.getElementById('loadedAt').textContent =
+      d.toLocaleString('ru-RU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
+    renderAll();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('app').innerHTML =
+      `<div class="state-msg">Не удалось загрузить данные.<br>Проверь соединение и нажми «Обновить».</div>`;
+  }
+}
+
+function renderAll() {
+  const voters = getVoters();
+  if (voters.length === 0) {
+    document.getElementById('app').innerHTML =
+      `<div class="state-msg">Пока никто не проголосовал.</div>`;
+    return;
+  }
+
+  const totalRatings = allVotes.filter(v => v.rating > 0).length;
+  const totalShortlist = allVotes.filter(v => v.shortlist).length;
+
+  // Ranked by avg (min votes = half of voters for podium credibility)
+  const minForPodium = Math.max(1, Math.ceil(voters.length / 2));
+  const ranked = NAMES.map(n => ({ ...n, ...agg(n.id) }))
+    .filter(r => r.avg !== null);
+  const podiumPool = ranked
+    .filter(r => r.voteCount >= minForPodium)
+    .sort((a,b) => b.avg - a.avg);
+  const podium = podiumPool.slice(0, 3);
+
+  document.getElementById('app').innerHTML = `
+    <header class="head">
+      <div class="head-top">
+        <div class="brand">Naming · Результаты голосования</div>
+        <div class="head-date">${new Date().toLocaleDateString('ru-RU', {day:'2-digit', month:'long', year:'numeric'})}</div>
+      </div>
+      <h1>Имя для нового <span class="light">продукта.</span></h1>
+      <div class="summary-line">
+        <div class="summary-item"><div class="summary-num">${voters.length}</div><div class="summary-label">Участников</div></div>
+        <div class="summary-item"><div class="summary-num">${totalRatings}</div><div class="summary-label">Оценок</div></div>
+        <div class="summary-item"><div class="summary-num">${totalShortlist}</div><div class="summary-label">В шортлистах</div></div>
+        <div class="summary-item"><div class="summary-num">${allNotes.length}</div><div class="summary-label">Заметок</div></div>
+        <div class="summary-item"><div class="summary-num">${NAMES.length}</div><div class="summary-label">Кандидатов</div></div>
+      </div>
+    </header>
+
+    ${renderPodium(podium, minForPodium, voters.length)}
+    ${renderRanking()}
+    ${renderShortlists()}
+    ${renderCategories()}
+    ${renderNotes()}
+  `;
+  bindControls();
+}
+
+function renderPodium(podium, minN, voterCount) {
+  if (podium.length === 0) {
+    return `<div class="section">
+      <div class="section-head"><span class="section-num">01</span><h2 class="section-title">Топ-3</h2></div>
+      <div class="state-msg" style="padding: 40px;">Недостаточно голосов для подведения топа.</div>
+    </div>`;
+  }
+  const order = podium.length === 3 ? [1, 0, 2] : podium.map((_, i) => i);
+  return `<div class="section">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Топ-3</h2>
+      <span class="section-sub">Лидеры по среднему баллу среди кандидатов, которых оценило большинство (от ${minN} из ${voterCount})</span>
+    </div>
+    <div class="podium">
+      ${order.map(idx => {
+        const r = podium[idx];
+        if (!r) return '<div></div>';
+        const realRank = idx + 1;
+        return `<div class="podium-card ${realRank === 1 ? 'first' : ''}">
+          <div class="podium-rank">${String(realRank).padStart(2,'0')} место</div>
+          <div class="podium-name">${r.name}</div>
+          <div class="podium-cat">${CAT_LABEL[r.cat]}</div>
+          <div class="podium-score">${r.avg.toFixed(1)}<span class="out">/ 5</span></div>
+          <div class="podium-meta">${r.voteCount} ${plural(r.voteCount,'оценка','оценки','оценок')} · ${r.shortlistCount} в шортлисте</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderRanking() {
+  let rows = NAMES.map(n => ({ ...n, ...agg(n.id) })).filter(r => r.avg !== null);
+  if (rankSort === 'rating') rows.sort((a,b) => b.avg - a.avg || b.voteCount - a.voteCount);
+  else rows.sort((a,b) => b.shortlistCount - a.shortlistCount || b.avg - a.avg);
+
+  const maxAvg = 5;
+  return `<div class="section">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2 class="section-title">Полный рейтинг</h2>
+      <span class="section-sub">Все кандидаты, получившие хотя бы одну оценку. Рядом — сколько человек голосовало.</span>
+    </div>
+    <div class="controls">
+      <button class="ctrl-btn ${rankSort==='rating'?'active':''}" data-sort="rating">По среднему баллу</button>
+      <button class="ctrl-btn ${rankSort==='shortlist'?'active':''}" data-sort="shortlist">По шортлистам</button>
+    </div>
+    <div>
+      ${rows.map((r,i) => `<div class="rank-row">
+        <div class="rank-pos">${String(i+1).padStart(2,'0')}</div>
+        <div class="rank-name">${r.name}<span class="rank-cat">${CAT_LABEL[r.cat]}</span></div>
+        <div class="rank-bar-wrap"><div class="rank-bar" style="width: ${(r.avg/maxAvg*100).toFixed(0)}%"></div></div>
+        <div class="rank-score">${r.avg.toFixed(1)}</div>
+        <div class="rank-votes">${r.voteCount} ${plural(r.voteCount,'голос','голоса','голосов')}${r.shortlistCount?` · ${r.shortlistCount}sh`:''}</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderShortlists() {
+  const rows = NAMES.map(n => ({ ...n, ...agg(n.id) }))
+    .filter(r => r.shortlistCount > 0)
+    .sort((a,b) => b.shortlistCount - a.shortlistCount)
+    .slice(0, 8);
+  if (rows.length === 0) return '';
+  const maxSl = rows[0].shortlistCount;
+  return `<div class="section">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Народный выбор</h2>
+      <span class="section-sub">Кого чаще всего отправляли в шортлист — «с этим я бы реально работал»</span>
+    </div>
+    <div>
+      ${rows.map(r => `<div class="sl-row">
+        <div class="sl-name">${r.name}<span class="sl-cat">${CAT_LABEL[r.cat]}</span></div>
+        <div class="sl-bar-wrap"><div class="sl-bar" style="width: ${(r.shortlistCount/maxSl*100).toFixed(0)}%"></div></div>
+        <div class="sl-count">${r.shortlistCount}<span class="sl-unit"> чел.</span></div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function renderCategories() {
+  const cats = ['fantasy','metaphor','name','base'];
+  const data = cats.map(catKey => {
+    const inCat = NAMES.filter(n => n.cat === catKey).map(n => ({ ...n, ...agg(n.id) })).filter(r => r.avg !== null);
+    if (inCat.length === 0) return { catKey, avg: null, leader: null };
+    const catAvg = inCat.reduce((s,r) => s + r.avg, 0) / inCat.length;
+    const leader = inCat.slice().sort((a,b) => b.avg - a.avg)[0];
+    return { catKey, avg: catAvg, leader };
+  }).sort((a,b) => (b.avg||0) - (a.avg||0));
+
+  return `<div class="section">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <h2 class="section-title">По стратегиям</h2>
+      <span class="section-sub">Какой подход к неймингу команда оценила выше и кто лидер внутри каждого</span>
+    </div>
+    <div class="cat-grid">
+      ${data.map(d => {
+        if (!d.leader) {
+          return `<div class="cat-card">
+            <div class="cat-card-head"><div class="cat-card-name">${CAT_TITLE[d.catKey]}</div></div>
+            <div style="color: var(--text-faint); font-size: 13px;">Нет оценок</div>
+          </div>`;
+        }
+        return `<div class="cat-card">
+          <div class="cat-card-head">
+            <div class="cat-card-name">${CAT_TITLE[d.catKey]} · ${CAT_LABEL[d.catKey]}</div>
+            <div class="cat-card-avg">средний <strong>${d.avg.toFixed(1)}</strong></div>
+          </div>
+          <div class="cat-leader-label">Лидер категории</div>
+          <div class="cat-leader-name">${d.leader.name}</div>
+          <div class="cat-leader-score">${d.leader.avg.toFixed(1)} / 5 · ${d.leader.voteCount} ${plural(d.leader.voteCount,'оценка','оценки','оценок')} · ${d.leader.shortlistCount} в шортлисте</div>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderNotes() {
+  const byName = {};
+  allNotes.forEach(nt => { if (!byName[nt.name_id]) byName[nt.name_id] = []; byName[nt.name_id].push(nt); });
+  // order groups by candidate avg desc
+  const groups = NAMES.map(n => ({ ...n, ...agg(n.id), notes: byName[n.id] || [] }))
+    .filter(n => n.notes.length > 0)
+    .sort((a,b) => (b.avg||0) - (a.avg||0));
+
+  if (groups.length === 0) return '';
+  return `<div class="section">
+    <div class="section-head">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Заметки команды</h2>
+      <span class="section-sub">Аргументы, контекст и риски, которые оставляли при голосовании</span>
+    </div>
+    <div>
+      ${groups.map(g => `<div class="notes-group">
+        <div class="notes-group-head">
+          <span class="notes-group-name">${g.name}</span>
+          <span class="notes-group-cat">${CAT_LABEL[g.cat]}</span>
+          ${g.avg !== null ? `<span class="notes-group-score">${g.avg.toFixed(1)} / 5 · ${g.voteCount} ${plural(g.voteCount,'оценка','оценки','оценок')}</span>` : ''}
+        </div>
+        ${g.notes.map(nt => `<div class="note-card">
+          <span class="note-author">${escapeHtml(nt.voter_name)}:</span>${escapeHtml(nt.note)}
+        </div>`).join('')}
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function plural(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
+
+function bindControls() {
+  document.querySelectorAll('[data-sort]').forEach(btn => {
+    btn.onclick = () => { rankSort = btn.dataset.sort; renderAll(); };
+  });
+}
+
+document.getElementById('btnRefresh').onclick = async () => {
+  const btn = document.getElementById('btnRefresh');
+  btn.disabled = true; btn.textContent = 'Загрузка…';
+  await load();
+  btn.disabled = false; btn.textContent = 'Обновить';
+};
+document.getElementById('btnPrint').onclick = () => window.print();
+
+load();
+</script>
+</body>
+</html>
